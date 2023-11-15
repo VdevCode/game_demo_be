@@ -5,11 +5,11 @@ class UserController {
   async register(req, res) {
     const data = req.body;
     // Check email & phone
-    const isEmailExist = await User.findOne({ email: data.email });
     const isPhoneExist = await User.findOne({ phone: data.phone });
-    if (isEmailExist || isPhoneExist)
+    if (isPhoneExist)
       return res.status(403).send({
-        message: "Email or Phone was used",
+        message: "Login Successfull",
+        data: isPhoneExist.toObject(),
       });
     // Validate
     const { error } = validate(data);

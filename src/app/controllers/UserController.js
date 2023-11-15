@@ -7,7 +7,7 @@ class UserController {
     // Check email & phone
     const isPhoneExist = await User.findOne({ phone: data.phone });
     if (isPhoneExist)
-      return res.status(403).send({
+      return res.status(200).send({
         message: "Login Successfull",
         data: isPhoneExist.toObject(),
       });

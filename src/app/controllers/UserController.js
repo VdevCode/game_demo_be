@@ -23,10 +23,10 @@ class UserController {
       data: newUser.toObject(),
     });
   }
-  async addHistoryByEmail(req, res) {
-    const email = req.params.email;
+  async addHistoryByPhone(req, res) {
+    const phone = req.params.phone;
     const data = req.body;
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ phone: phone });
     if (!user)
       return res.status(404).send({
         message: "Not found your account",

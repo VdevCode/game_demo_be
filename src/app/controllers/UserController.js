@@ -100,7 +100,7 @@ class UserController {
   }
   async exportFileXlsx(req, res) {
     try {
-      const users = await User.find({ role: 0, isValidAccount: true }).exec();
+      const users = await User.find({}).exec();
       const workbook = new excelJs.Workbook();
       const sheet = workbook.addWorksheet("data");
       sheet.columns = [
@@ -110,7 +110,7 @@ class UserController {
         { header: "Email", key: "email", width: 25 },
         { header: "Địa chỉ", key: "address", width: 25 },
         { header: "Tên trường THPT", key: "school", width: 25 },
-        { header: "Điểm số", key: "score", width: 25 },
+        { header: "Ngành học quan tâm", key: "major", width: 25 },
       ];
       users.map((user, idx) => {
         sheet.addRow({
@@ -120,7 +120,7 @@ class UserController {
           email: user.email,
           address: user.address,
           school: user.school,
-          score: user.highestScore,
+          major: user.majors[0] ? user.majors[0] : "Không xác định",
         });
       });
       // Thiết lập các header cho phản hồi HTTP
@@ -133,6 +133,24 @@ class UserController {
     } catch (error) {
       throw new Error(error);
     }
+  }
+  async addMajorByPhone(req, res) {
+    const major = req.body.major;
+    const phone = req.params.phone;
+    const user = await User.findOne({ phone });
+    if (!user)
+      return res.status(404).send({
+        message: "Không tim thấy tài khoản của bạn",
+      });
+    let update = user.toObject();
+    const majors = update.majors;
+    const isExist = majors.find((item) => item.includes(major)) ? true : false;
+    if (!isExist) update.majors.push(major);
+    // Saving
+    const response = await User.findByIdAndUpdate(update._id, update);
+    return res.status(200).send({
+      message: "Update was sucessfull",
+    });
   }
 }
 

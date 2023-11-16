@@ -1,11 +1,9 @@
-const UserController = require("../app/controllers/UserController");
+const giftRoutes = require("./gift");
+const userRoutes = require("./user");
 
 function route(app) {
-  app.post("/api/auth/register", UserController.register);
-  app.post("/api/user/saveHistory/:phone", UserController.addHistoryByPhone);
-  app.get("/api/user/ranking", UserController.getRanking);
-  app.get("/api/user/myRanking/:phone", UserController.getMyRanking);
-  app.get("/api/user/download", UserController.exportFileXlsx);
+  app.use("/api/user", userRoutes);
+  app.use("/api/gift", giftRoutes);
 }
 
 module.exports = route;

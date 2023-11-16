@@ -62,13 +62,37 @@ class UserController {
   }
   async getRanking(req, res) {
     try {
-      const data = await User.find()
-        .sort({ highestScore: -1 })
-        .limit(100)
-        .exec();
+      const data = await User.find().sort({ highestScore: -1 }).limit(5).exec();
       return res.status(200).send({
         message: "Ranking",
         data,
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async getMyRanking(req, res) {
+    try {
+      const phone = req.params.phone;
+      const users = await User.find()
+        .sort({ highestScore: -1 })
+        .limit(100)
+        .exec();
+
+      let userRank = users.findIndex((user) => user.phone === phone);
+      let userData = {};
+
+      if (userRank !== -1) {
+        userData = users[userRank];
+        userRank += 1;
+      } else {
+        userRank = "100+";
+      }
+
+      return res.status(200).send({
+        message: "Ranking",
+        userRank,
+        userData,
       });
     } catch (error) {
       throw new Error(error);

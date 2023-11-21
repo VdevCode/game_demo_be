@@ -1,7 +1,59 @@
 const { User, validate } = require("../models/User");
 const excelJs = require("exceljs");
+const axios = require("axios");
+const tokenUtils = require("../../utils/token");
+const CryptoJS = require("crypto-js");
 
+let token = undefined;
+async function getToken() {
+  if (!token || tokenUtils.isTokenExpired(token)) {
+    const session_id = tokenUtils.generateString();
+    const data = {
+      client_id: "a33c22312f241A08D4e28Cb3151C1f9f05229dd2",
+      client_secret:
+        "0305377acb417b37fb45729ebe3Ce884f78fe2f662b37C98ce26cf0a9Eb25011829ed929",
+      scope: "send_brandname_otp send_brandname",
+      session_id,
+      grant_type: "client_credentials",
+    };
+    const response = await axios.post(
+      "https://app.sms.fpt.net/oauth2/token",
+      data
+    );
+    const now = new Date();
+    token = {
+      access_token: response.data.access_token,
+      created_at: now.toLocaleString(),
+    };
+  }
+  return token;
+}
 class UserController {
+  async sendOTP(req, res) {
+    token = await getToken();
+    const { phone, code } = req.body;
+    const session_id = tokenUtils.generateString();
+    const plaintext =
+      "Chào mừng bạn đến với trò chơi FlappyBee, để xác thực tài khoản vui lòng nhập mã sau: " +
+      code;
+    const encodedMsg = CryptoJS.enc.Base64.stringify(
+      CryptoJS.enc.Utf8.parse(plaintext)
+    );
+    const data = {
+      access_token: token.access_token,
+      session_id,
+      BrandName: "CaoDang FPT",
+      Phone: phone,
+      Message: encodedMsg,
+      RequestId: "tranID-Core01-987654321",
+    };
+    const response = await axios.post(
+      "https://app.sms.fpt.net/api/push-brandname-otp",
+      data
+    );
+    console.log(response);
+    return res.status(200).send({ data: "Đã gửi tin nhắn thành công" });
+  }
   async register(req, res) {
     const data = req.body;
     // Check email & phone

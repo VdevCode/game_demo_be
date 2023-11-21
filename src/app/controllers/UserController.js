@@ -20,6 +20,7 @@ async function getToken() {
       "https://app.sms.fpt.net/oauth2/token",
       data
     );
+    console.log(response);
     const now = new Date();
     token = {
       access_token: response.data.access_token,

@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema(
     school: { type: String, default: "Trống" },
     phone: { type: String, default: "" },
     highestScore: { type: Number, default: 0 },
-    history: { type: Array, default: [] },
     isValidAccount: { type: Boolean, default: false },
     majors: { type: Array, default: [] },
     gift: { type: Boolean, default: false },

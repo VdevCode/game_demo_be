@@ -9,18 +9,13 @@ async function getToken() {
   if (!token || tokenUtils.isTokenExpired(token)) {
     const session_id = tokenUtils.generateString();
     const data = {
-      client_id: "a33c22312f241A08D4e28Cb3151C1f9f05229dd2",
-      client_secret:
-        "0305377acb417b37fb45729ebe3Ce884f78fe2f662b37C98ce26cf0a9Eb25011829ed929",
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
       scope: "send_brandname_otp send_brandname",
       session_id,
       grant_type: "client_credentials",
     };
-    const response = await axios.post(
-      "https://app.sms.fpt.net/oauth2/token",
-      data
-    );
-    console.log(response);
+    const response = await axios.post(process.env.OTP_CONNECT, data);
     const now = new Date();
     token = {
       access_token: response.data.access_token,
@@ -43,7 +38,7 @@ class UserController {
     const data = {
       access_token: token.access_token,
       session_id,
-      BrandName: "CaoDang FPT",
+      BrandName: "FPOLY",
       Phone: phone,
       Message: encodedMsg,
       RequestId: "tranID-Core01-987654321",
@@ -52,7 +47,6 @@ class UserController {
       "https://app.sms.fpt.net/api/push-brandname-otp",
       data
     );
-    console.log(response);
     return res.status(200).send({ data: "Đã gửi tin nhắn thành công" });
   }
   async register(req, res) {
@@ -84,29 +78,12 @@ class UserController {
       return res.status(404).send({
         message: "Not found your account",
       });
-    // Save
-    if (user.history.length > 3)
-      return res.status(403).send({
-        message: "The number of turns has been exceeded",
-      });
     // Saving
     let newData = user.toObject();
     // Update score
     const newPoints =
       newData.highestScore < data.coins ? data.coins : newData.highestScore;
-    // Update histoty
-    const history = newData.history;
-    const newTurn = {
-      major: data.major,
-      bee: data.bee,
-      win: data.win,
-      hp: data.hp,
-      defaultHp: data.defaultHp,
-      barriesDefault: data.barriesDefault,
-      coins: data.coins,
-    };
-    history.push(newTurn);
-    newData = { ...newData, highestScore: newPoints, history };
+    newData = { ...newData, highestScore: newPoints };
     // Saving
     const response = await User.findByIdAndUpdate(newData._id, newData);
     return res

@@ -59,6 +59,7 @@ class GiftController {
     });
   }
   async getAll(req, res) {
+    // const gifts = await Gift.find({ total: { $gt: 0 } }).exec();
     const gifts = await Gift.find({ total: { $gt: 0 } }).exec();
     return res.status(200).send({
       message: "All gift",

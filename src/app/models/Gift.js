@@ -10,7 +10,7 @@ const giftSchema = new mongoose.Schema(
 );
 
 // Create Model
-const Gift = mongoose.model("Gift", giftSchema);
+const Gift = mongoose.model("Gift", giftSchema, "gifts");
 
 // Export
 module.exports = { Gift };

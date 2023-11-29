@@ -41,10 +41,9 @@ class GiftController {
     updateUser.gift = true;
     giftsOwner.push(data);
     updateGift.owners = giftsOwner;
-    updateGift.total -= 1;
     // Save
-    const saveUser = await User.findByIdAndUpdate(updateUser._id, updateUser);
-    const saveGift = await Gift.findByIdAndUpdate(updateGift._id, updateGift);
+    await User.findByIdAndUpdate(updateUser._id, updateUser);
+    await Gift.findByIdAndUpdate(updateGift._id, updateGift);
 
     return res.status(200).send({
       message: "Update gifts",

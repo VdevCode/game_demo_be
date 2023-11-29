@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, default: "Trống" },
     name: { type: String, default: "Không xác định" },
     school: { type: String, default: "Trống" },
+    address: { type: String, default: "Không xác định" },
     phone: { type: String, default: "" },
     highestScore: { type: Number, default: 0 },
     isValidAccount: { type: Boolean, default: false },
@@ -24,6 +25,7 @@ const validate = (user) => {
     name: Joi.string(),
     email: Joi.allow(),
     school: Joi.allow(),
+    address: Joi.allow(),
   });
   return Schema.validate(user);
 };

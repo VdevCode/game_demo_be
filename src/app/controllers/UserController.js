@@ -134,13 +134,13 @@ class UserController {
       const workbook = new excelJs.Workbook();
       const sheet = workbook.addWorksheet("data");
       sheet.columns = [
-        { header: "Số thứ tự", key: "idx", width: 25 },
+        { header: "Số thứ tự", key: "idx", width: 5 },
         { header: "Họ và tên", key: "name", width: 25 },
-        { header: "Số điện thoại", key: "phone", width: 25 },
+        { header: "Số điện thoại", key: "phone", width: 15 },
         { header: "Email", key: "email", width: 25 },
-        { header: "Địa chỉ", key: "address", width: 25 },
+        { header: "Tỉnh thành", key: "address", width: 20 },
         { header: "Tên trường THPT", key: "school", width: 25 },
-        { header: "Ngành học quan tâm", key: "major", width: 25 },
+        { header: "Ngành học quan tâm", key: "major", width: 10 },
       ];
       users.map((user, idx) => {
         sheet.addRow({

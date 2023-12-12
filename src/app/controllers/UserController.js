@@ -30,8 +30,7 @@ class UserController {
     const { phone, code } = req.body;
     const session_id = tokenUtils.generateString();
     const plaintext =
-      "Chào mừng bạn đến với trò chơi FlappyBee, để xác thực tài khoản vui lòng nhập mã sau: " +
-      code;
+      "Sử dụng mã " + code + " để xác thực tài khoản trò chơi Flappy Bee";
     const encodedMsg = CryptoJS.enc.Base64.stringify(
       CryptoJS.enc.Utf8.parse(plaintext)
     );
@@ -48,6 +47,20 @@ class UserController {
       data
     );
     return res.status(200).send({ data: "Đã gửi tin nhắn thành công" });
+  }
+  async login(req, res) {
+    const phone = req.params.phone;
+    if (!phone) return res.status(400).send({ data: "Not Found" });
+    const user = await User.findOne({ phone });
+    if (user)
+      return res.status(200).send({
+        message: "Login Successfull",
+        data: user.toObject(),
+      });
+
+    return res.status(404).send({
+      data: "Not found",
+    });
   }
   async register(req, res) {
     const data = req.body;

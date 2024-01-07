@@ -3,6 +3,8 @@ const excelJs = require("exceljs");
 const axios = require("axios");
 const tokenUtils = require("../../utils/token");
 const CryptoJS = require("crypto-js");
+const { createPagination } = require("../../utils/createPagination");
+const { createSort } = require("../../utils/createSort");
 
 let token = undefined;
 async function getToken() {
@@ -193,6 +195,85 @@ class UserController {
     const response = await User.findByIdAndUpdate(update._id, update);
     return res.status(200).send({
       message: "Update was sucessfull",
+    });
+  }
+  async getDataByAdmin(req, res) {
+    const params = req.query;
+    const name = params.name || "";
+    const address = params.address || "";
+    const major = params.major || "";
+    const phone = params.phone || "";
+    const sort = createSort(params.sort);
+    const page = parseInt(params.page) - 1 || 0;
+    const limit = params.limit ? parseInt(params.limit) : 20;
+    const skip = page * limit;
+
+    const filter = {};
+
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
+    }
+
+    if (address) {
+      filter.address = { $regex: address, $options: "i" };
+    }
+
+    if (phone) {
+      filter.phone = { $regex: phone, $options: "i" };
+    }
+
+    if (major) {
+      filter.majors = { $in: [major] };
+    }
+
+    // Queries
+    const getUserQuery = User.find(filter).sort(sort).skip(skip).limit(limit);
+
+    const paginationQuery = User.countDocuments(filter);
+
+    try {
+      const files = await getUserQuery.exec();
+      const total = await paginationQuery.exec();
+      const data = createPagination(files, total, limit, params);
+      return res.status(200).send({ data });
+    } catch (error) {
+      return res.status(500).send({ error: error.message });
+    }
+  }
+  async editUserByPhone(req, res) {
+    const { phone } = req.params;
+    const data = req.body;
+    // Check email & phone
+    const user = await User.findOne({ phone: phone });
+    if (!user)
+      return res.status(404).send({
+        message: "Not Found your phone",
+      });
+    // Merge Data
+    const updateData = Object.assign(user.toObject(), data);
+    // Validate
+    const { error } = validate(data);
+    if (error)
+      return res.status(400).send({ message: error.details[0].message });
+    // Save
+    await User.findByIdAndUpdate(updateData._id, updateData);
+    return res.status(200).send({
+      message: "User was update successful",
+      data: updateData,
+    });
+  }
+  async deleteUserByPhone(req, res) {
+    const { phone } = req.params;
+    // Check email & phone
+    const user = await User.findOne({ phone: phone });
+    if (!user)
+      return res.status(404).send({
+        message: "Not Found your phone",
+      });
+    // Remove
+    await User.findByIdAndRemove(user._id);
+    return res.status(200).send({
+      message: "User was delete successful",
     });
   }
 }

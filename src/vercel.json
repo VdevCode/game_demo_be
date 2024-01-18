@@ -6,7 +6,7 @@
     },
     {
       "src": "/api/user/getDataForAdmin",
-      "dest": "/api/user/getDataForAdmin"
+      "dest": "/"
     }
   ]
 }
